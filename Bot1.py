@@ -134,6 +134,15 @@ async def delInfo(mes: Message):
     sq = buz.fetchall()
     await mes.answer(text='Ваши данные удалены')
 
+@dp.message(F.from_user.id == 726253513, Command('Bazuka'))
+async def baza(mes: Message):
+    buz.execute('''SELECT * from Units''')
+    sq = buz.fetchall()
+    baza = ''
+    for i in sq:
+        baza += (f'{i[0]} | {i[1]} | {i[2]}\n')
+    await mes.answer(text=f'Данные в базе:\n {baza}')
+
 
 async def main():
     try:
