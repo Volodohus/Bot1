@@ -96,22 +96,25 @@ async  def bN(mes: Message, state: FSMContext) -> None:
 async def danu(mes: Message, state: FSMContext) -> None:
     if mes.text.lower() == "да":
         dat = await state.get_data()
-        logging.info("KUKU", [dat])
 
-        buz.execute(f'''SELECT id from Units where id = {dat['userID']}''')
+        buz.execute(f'''SELECT id from Units where id = {dat['userID']};''')
         sq = buz.fetchall()
+        logging.info("KUKU", [dat,sq])
 
-        if (dat['userID']) in sq:
-            buz.execute(f'''UPDATE Units SET Name = ?, Surname=?, Age=? WHERE id = {dat['userID']}''',(dat['name'],dat['fam'],dat['voz']))
+        if (dat['userID'],) in sq:
+            buz.execute(f'''UPDATE Units SET Name = ?, Surname=?, Age=? WHERE id = {dat['userID']};''',(dat['name'],dat['fam'],dat['voz']))
+            buz.connection.commit()
             await mes.answer(text='Твои данные изменены.', reply_markup=ReplyKeyboardRemove())
 
-        elif (dat['userID']) not in sq:
-            buz.execute('''INSERT INTO Units (id,Name,Surname,Age) VALUES (?,?,?,?)''',(dat['userID'],dat['name'],dat['fam'],dat['voz']))
+        elif (dat['userID'],) not in sq:
+            buz.execute('''INSERT INTO Units (id,Name,Surname,Age) VALUES (?,?,?,?);''',(dat['userID'],dat['name'],dat['fam'],dat['voz']))
+            buz.connection.commit()
             await mes.answer(text='Добро пожаловать.', reply_markup=ReplyKeyboardRemove())
         else:
             await mes.answer(text='хня', reply_markup=ReplyKeyboardRemove())
-        baza.commit()
+
         await state.clear()
+
     elif mes.text.lower() == 'нет':
         await mes.answer(text='Лучше бы добавиться.',reply_markup=ReplyKeyboardRemove())
         await state.clear()
@@ -123,24 +126,24 @@ async def danu(mes: Message, state: FSMContext) -> None:
 @dp.message(Command('ib'))
 async def info(mes: Message):
     dat = mes.from_user.id
-    buz.execute(f'''SELECT Name, Surname, Age from Units where id = {dat}''')
-    sq = buz.fetchall()
-    await mes.answer(text=f'Твои данные в базе - Имя: {sq[0][0]} Фамилия: {sq[0][1]} Возраст: {sq[0][2]}')
+    buz.execute(f'''SELECT Name, Surname, Age from Units where id = {dat};''')
+    sq = buz.fetchone()
+    await mes.answer(text=f'Твои данные в базе - Имя: {sq[0]} Фамилия: {sq[1]} Возраст: {sq[2]}')
 
 @dp.message(Command('db'))
 async def delInfo(mes: Message):
     dat = mes.from_user.id
-    buz.execute(f'''DELETE from Units where id = {dat}''')
-    sq = buz.fetchall()
+    buz.execute(f'''DELETE from Units where id = {dat};''')
+    buz.connection.commit()
     await mes.answer(text='Ваши данные удалены')
 
 @dp.message(F.from_user.id == 726253513, Command('Bazuka'))
 async def baza(mes: Message):
-    buz.execute('''SELECT * from Units''')
+    buz.execute('''SELECT * from Units;''')
     sq = buz.fetchall()
-    baza = ''
+    baz = ''
     for i in sq:
-        baza += (f'{i[0]} | {i[1]} | {i[2]}\n')
+        baz += (f'{i[0]} | {i[1]} | {i[2]}\n')
     await mes.answer(text=f'Данные в базе:\n {baza}')
 
 
