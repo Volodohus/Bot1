@@ -16,7 +16,7 @@ from aiogram.filters import Filter
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from test import toki
+from test import toki, aid
 
 # ДЗ: сделать бота, который будет запрашивать данные пользователя и сохранять их в стейт.
 # Со звездочкой: так же сохранять и в базу данных.
@@ -137,7 +137,7 @@ async def delInfo(mes: Message):
     buz.connection.commit()
     await mes.answer(text='Ваши данные удалены')
 
-@dp.message(F.from_user.id == 726253513, Command('Bazuka'))
+@dp.message(F.from_user.id == aid, Command('Bazuka'))
 async def baza(mes: Message):
     buz.execute('''SELECT * from Units;''')
     sq = buz.fetchall()
